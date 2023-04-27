@@ -2,8 +2,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <errno.h>
+#include <fcntl.h>
+#include <ctype.h>
 
+
+#define DEFAULT_BLOCKSIZE 512
 
 /*
 Explanation:
@@ -32,16 +35,6 @@ dd command replaces the destination file by default, it overrides. To prevent it
 note: ucase and lcase are mutually exclusive. If both of them exist, error occurs.
 */
 
-
-/// @brief This function will be used to check the correctness of given filepaths
-void check_filepath(const char* filepath)
-{
-    if(access(filepath, F_OK) == -1)
-    {
-        fprintf(stderr, "Filepath is not valid: %s\n", filepath);
-        exit(EXIT_FAILURE);
-    }
-}
 
 
 int main(int argc, char* argv[])
@@ -135,11 +128,15 @@ int main(int argc, char* argv[])
     }
 
     // Checking and parsing arguments
+    // if file should exist
     if(flag_if)
-        check_filepath(arg_if);
-
-    if(flag_of)
-        check_filepath(arg_of);
+    {
+        if(access(arg_if, F_OK) == -1)
+        {
+            fprintf(stderr, "if: %s does not exist!\n", arg_if);
+            exit(EXIT_FAILURE);
+        }
+    }
 
     if(flag_bs)
     {
@@ -151,6 +148,12 @@ int main(int argc, char* argv[])
             fprintf(stderr, "Invalid block size %s\n", arg_bs);
             exit(EXIT_FAILURE);
         }
+    }
+
+    // if block size is not given
+    else
+    {
+        block_size = DEFAULT_BLOCKSIZE;
     }
 
     if(flag_count)
@@ -195,6 +198,17 @@ int main(int argc, char* argv[])
         }
     }
 
+    // whether of file should not exist or not depends on excl option
+    if(flag_of && flag_conv_excl)
+    {
+        if(access(arg_of, F_OK) != -1)
+        {
+            fprintf(stderr, "of: %s is already exist!\n", arg_of);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+
     // note: ucase and lcase are mutually exclusive. If both of them exist, error occurs.
     if(flag_conv_ucase && flag_conv_lcase)
     {
@@ -211,6 +225,93 @@ int main(int argc, char* argv[])
             exit(EXIT_FAILURE);
         }
     }
+
+    // Copying from if to of
+    int fd_if, fd_of;
+
+    if(flag_if)
+        fd_if = open(arg_if, O_RDONLY);
+    else
+        fd_if = open("/dev/stdin", O_RDONLY);
+
+    if(flag_of)
+        fd_of = open(arg_of, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    else
+        fd_of = open("/dev/stdout", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+
+    if(fd_if == -1)
+    {
+        fprintf(stderr, "Error while opening if file\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if(fd_of == -1)
+    {
+        fprintf(stderr, "Error while opening of file\n");
+        exit(EXIT_FAILURE);
+    }
+
+    char buffer[block_size];
+    int read_bytes, write_bytes;
+
+    int total_bytes_read, total_bytes_written;
+    total_bytes_read = total_bytes_written = 0;
+
+    int iterations = 1;
+
+    while((read_bytes = read(fd_if, buffer, block_size)) > 0)
+    {
+        total_bytes_read += read_bytes;
+
+        if(flag_conv_ucase)
+        {
+            for(int i=0; i < read_bytes; ++i)
+            {
+                buffer[i] = toupper(buffer[i]);
+            }
+        }
+
+        else if(flag_conv_lcase)
+        {
+            for(int i=0; i < read_bytes; ++i)
+            {
+                buffer[i] = tolower(buffer[i]);
+            }
+        }
+
+        write_bytes = write(fd_of, buffer, read_bytes);
+
+        total_bytes_written += write_bytes;
+
+        if(write_bytes == -1)
+        {
+            fprintf(stderr, "Error while writing to of file\n");
+            exit(EXIT_FAILURE);
+        }
+
+
+        // break loop and stop copying if count is reached
+        if(flag_count)
+        {
+            if(iterations == block_count)
+                break;
+        }
+
+        iterations++;
+    }
+
+    if(read_bytes == -1)
+    {
+        fprintf(stderr, "Error while reading from if file\n");
+        exit(EXIT_FAILURE);
+    }
+
+    close(fd_if);
+    close(fd_of);
+
+    printf("%d bytes read\n", total_bytes_read);
+    printf("%d bytes written\n", total_bytes_written);
 
     puts("\n");
  
