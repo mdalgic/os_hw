@@ -61,7 +61,7 @@ int write_lines(const char* filename, const int line_amount) {
 
 int main(int argc, char* argv[])
 {
-    fprintf(stdout, "[HW1 Q1]\n");
+    fprintf(stdout, "[HW1 Q1: kind of head program]\n");
 
     int result;
     int flag_bytes, flag_lines, flag_verbose, flag_help, flag_version, flag_error;
@@ -127,10 +127,8 @@ int main(int argc, char* argv[])
 
                 flag_error = 1;
                 break;
-
         }
     }    
-
 
     if(flag_error)   
         exit(EXIT_FAILURE);
@@ -163,7 +161,6 @@ int main(int argc, char* argv[])
             write_lines("/dev/stdin", DEFAULT_LINE_AMOUNT);
         }
     }
-
 
     if(flag_bytes)
     {
@@ -218,10 +215,6 @@ int main(int argc, char* argv[])
                 write_lines("/dev/stdin", line_amount);
             }
         }
-        
-
-        
-
     }
 
     if(flag_help)
@@ -236,7 +229,7 @@ int main(int argc, char* argv[])
            "      --help                display this help and exit\n"
            "      --version             output version information and exit\n"
            "\n"
-           "With no FILE, or when FILE is -, read standard input.\n");
+           "With no FILE read standard input.\n");
     }
 
     if(flag_version)
@@ -244,8 +237,5 @@ int main(int argc, char* argv[])
         fprintf(stdout, "Version: %lf\n", VERSION);
     }
  
- 
- 
-
     return 0;
 }
