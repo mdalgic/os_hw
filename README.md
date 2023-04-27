@@ -7,7 +7,7 @@ This repository will mainly contain solutions of operating system course homewor
 | #    | Explanation                                                  |
 | ---- | ------------------------------------------------------------ |
 | 1    | Custom implementation of `head` and `tail` POSIX functions with lower level functions. |
-|      |                                                              |
+| 2    | Custom implementation of `dd` POSIX function.                |
 |      |                                                              |
 |      |                                                              |
 |      |                                                              |
