@@ -158,6 +158,8 @@ int main(int argc, char* argv[])
 
         else
         {
+            if(flag_verbose)
+                fprintf(stdout, "[File: /dev/stdin]\n");
             write_lines("/dev/stdin", DEFAULT_LINE_AMOUNT);
         }
     }
@@ -184,6 +186,8 @@ int main(int argc, char* argv[])
 
             else
             {
+                if(flag_verbose)
+                    fprintf(stdout, "[File: /dev/stdin]\n");
                 write_bytes("/dev/stdin", byte_amount);
             }
         }  
@@ -209,6 +213,8 @@ int main(int argc, char* argv[])
             }
             else
             {
+                if(flag_verbose)
+                    fprintf(stdout, "[File: /dev/stdin]\n");
                 write_lines("/dev/stdin", line_amount);
             }
         }
