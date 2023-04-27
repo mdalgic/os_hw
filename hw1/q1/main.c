@@ -32,10 +32,29 @@ int write_bytes(const char* filename, const int byte_amount)
     return 0;
 }
 
+int write_lines(const char* filename, const int line_amount) {
+    // Open the file for reading
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        fprintf(stderr, "Error opening file: %s\n", filename);
+        return -1;
+    }
 
+    // Set the file position indicator to the beginning of the file
+    fseek(file, 0L, SEEK_SET);
 
-int write_lines(const char* filename, const int line_amount)
-{
+    // Read and print the requested number of lines from the file
+    char line[1024];
+    int line_count = 0;
+    while (fgets(line, sizeof(line), file) != NULL && line_count < line_amount) {
+        fprintf(stdout, "%s", line);
+        line_count++;
+    }
+
+    // Close the file
+    fclose(file);
+
+    putchar('\n');
 
     return 0;
 }
@@ -137,11 +156,9 @@ int main(int argc, char* argv[])
             }
         }
 
-        // TODO: Add this part.
-        // There is no input file
         else
         {
-
+            write_lines("/dev/stdin", DEFAULT_LINE_AMOUNT);
         }
     }
 
@@ -164,6 +181,11 @@ int main(int argc, char* argv[])
                     write_bytes(argv[i], byte_amount);
                 }
             }
+
+            else
+            {
+                write_bytes("/dev/stdin", byte_amount);
+            }
         }  
     }
 
@@ -184,6 +206,10 @@ int main(int argc, char* argv[])
                         fprintf(stdout, "[File: %s]\n", argv[i]);
                     write_lines(argv[i], line_amount);
                 }
+            }
+            else
+            {
+                write_lines("/dev/stdin", line_amount);
             }
         }
         
