@@ -1,14 +1,16 @@
 #include <stdio.h>
 #include <getopt.h>
+#include <stdlib.h>
+
+#define DEFAULT_LINE_AMOUNT 10
+#define VERSION 1.0
+
+
 
 
 int main(int argc, char* argv[])
 {
-    fprintf(stdout, "HW1 Q1 program was started!\n");
-
-
-
-
+    fprintf(stdout, "[HW1 Q1]\n");
 
     int result;
     int flag_bytes, flag_lines, flag_verbose, flag_help, flag_version, flag_error;
@@ -23,7 +25,7 @@ int main(int argc, char* argv[])
         {0, 0, 0, 0},
     };
 
-    flag_bytes = flag_lines = flag_verbose = flag_help = flag_verbose = flag_error = 0;
+    flag_bytes = flag_lines = flag_verbose = flag_help = flag_version = flag_error = 0;
 
     // prevent default error messages
     opterr = 0;
@@ -78,36 +80,73 @@ int main(int argc, char* argv[])
     }    
 
 
+    if(flag_error)   
+        exit(EXIT_FAILURE);
+
+    // if both are defined
+    if (flag_bytes & flag_lines)
+    {
+        fprintf(stderr, "-c and -n options can not be used together!\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // if neither is defined
+    if ((flag_bytes | flag_lines) == 0)
+    {   
+        // fprintf(stdout, "Neither was defined\n");
+
+        flag_lines = 1;
+        // arg_lines = DEFAULT_LINE_AMOUNT;
+    }
 
 
+    if(flag_bytes)
+    {
+
+    }
+
+    if(flag_lines)
+    {
+
+    }
+
+    if(flag_verbose)
+    {
+        // optind is the index of the starting point of arguments without option
+        if (optind != argc)
+        {
+            fprintf(stdout, "-------Files--------\n");
+
+            for (int i = optind; i < argc; ++i)
+                puts(argv[i]);
+            
+            fprintf(stdout, "--------------------\n");
+        }
+    }
 
 
-    // if (err_flag)
-    //     exit(EXIT_FAILURE);
+    if(flag_help)
+    {
+            printf("Usage: head [OPTION]... [FILE]...\n"
+           "Print the first 10 lines of each specified FILE to standard output. With more than one FILE, precede each with a header giving the file name.\n"
+           "\n"
+           "Options:\n"
+           "  -c, --bytes=[-]NUM        print the first NUM bytes of each file; with the leading '-', print all but the last NUM bytes of each file\n"
+           "  -n, --lines=[-]NUM        print the first NUM lines of each file; with the leading '-', print all but the last NUM lines of each file\n"
+           "  -v, --verbose             always output headers giving file names\n"
+           "      --help                display this help and exit\n"
+           "      --version             output version information and exit\n"
+           "\n"
+           "With no FILE, or when FILE is -, read standard input.\n");
+    }
 
-    // if (a_flag)
-    //     printf("-a option given\n");
-    // if (b_flag)
-    //     printf("-b option given with argument \"%s\"\n", b_arg);
-    // if (all_flag)
-    //     printf("--all option given\n");
-    // if (length_flag)
-    //     printf("--length option given with argument \"%s\"\n", length_arg);
-    // if (number_flag)
-    //     if (number_arg != NULL)
-    //         printf("--number option given with argument \"%s\"\n", number_arg);
-    //     else
-    //         printf("--number option given without argument\n");
-       
-    // if (optind != argc) 
-    //     printf("Arguments without options:\n");
-    // for (int i = optind; i < argc; ++i)
-    //     puts(argv[i]);
-    
-    // return 0;
-
-
-
-
+    if(flag_version)
+    {
+        fprintf(stdout, "Version: %lf\n", VERSION);
+    }
+ 
+ 
+ 
+ 
     return 0;
 }
