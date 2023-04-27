@@ -11,7 +11,7 @@ int write_bytes(const char* filename, const int byte_amount)
     FILE* file = fopen(filename, "rb");
     if (file == NULL) {
         fprintf(stderr, "Error opening file: %s\n", filename);
-        return;
+        return -1;
     }
 
     // Set the file position indicator to the beginning of the file
@@ -240,6 +240,6 @@ int main(int argc, char* argv[])
  
  
  
- 
+
     return 0;
 }
